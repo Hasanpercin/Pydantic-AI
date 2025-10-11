@@ -1,0 +1,34 @@
+# Core Framework
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+
+# Pydantic AI
+pydantic-ai==0.0.14
+pydantic==2.8.2
+
+# LLM Provider
+anthropic==0.34.2
+
+# HTTP Client
+httpx==0.25.2
+
+# WebSocket
+python-socketio==5.10.0
+
+# Memory & Context
+zep-cloud==2.0.0
+
+# Caching
+redis==5.0.1
+
+# Monitoring (optional)
+logfire==0.20.0
+
+# Environment
+python-dotenv==1.0.0
+
+# Utilities
+python-multipart==0.0.6
+
+# Settings Management
+pydantic-settings==2.0.3
