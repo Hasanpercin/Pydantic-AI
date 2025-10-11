@@ -12,9 +12,8 @@ RUN apt-get update && apt-get install -y \
 # Copy requirements
 COPY requirements.txt .
 
-# Force fresh install
-ARG CACHEBUST=1
-RUN echo "Cache bust: $CACHEBUST"
+# Install griffe FIRST (manuel)
+RUN pip install --no-cache-dir griffe>=1.4.0
 
 # Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
