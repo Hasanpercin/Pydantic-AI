@@ -42,10 +42,10 @@ docker-compose up --build
 4. **Test the API:**
 ```bash
 # Health check
-curl http://localhost:8000/health
+curl http://localhost:8585/health
 
 # Chat
-curl -X POST http://localhost:8000/chat \
+curl -X POST http://localhost:8585/chat \
   -H "Content-Type: application/json" \
   -d '{"message": "Merhaba!"}'
 ```
@@ -204,7 +204,7 @@ curl -X POST https://agent.yourdomain.com/chat \
 python agent.py
 
 # Test API
-curl -X POST http://localhost:8000/chat \
+curl -X POST http://localhost:8585/chat \
   -H "Content-Type: application/json" \
   -d '{"message": "Güneşim hangi burçta?"}'
 ```
