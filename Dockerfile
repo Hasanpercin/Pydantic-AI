@@ -27,3 +27,7 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
 
 # Run application
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8585"]
+
+# Force fresh install
+ARG CACHEBUST=1
+RUN echo "Cache bust: $CACHEBUST"
