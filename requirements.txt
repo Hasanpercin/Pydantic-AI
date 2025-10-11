@@ -2,11 +2,9 @@
 fastapi>=0.115.0
 uvicorn[standard]==0.24.0
 
-# Pydantic AI
-pydantic-ai==0.0.14
-pydantic>=2.10.0
-griffe>=1.3.2
-eval-type-backport>=0.2.0
+# Pydantic AI - ESKI STABLE VERSION
+pydantic-ai==0.0.13
+pydantic>=2.9.0,<2.10
 
 # Anthropic
 anthropic>=0.40.0
