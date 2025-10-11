@@ -13,7 +13,7 @@ class Settings(BaseSettings):
     
     # Core
     ENVIRONMENT: str = "production"
-    PORT: int = 8000
+    PORT: int = 8585  
     LOG_LEVEL: str = "INFO"
     
     # Anthropic
