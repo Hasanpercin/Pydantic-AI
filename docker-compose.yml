@@ -7,7 +7,7 @@ services:
       - "8585:8585"  # 8000:8000'den değiştir
     environment:
       - ENVIRONMENT=development
-      - PORT=8585  # 8000'den değiştir
+      - PORT=8585  
       - REDIS_URL=redis://redis:6379/0
     env_file:
       - .env
