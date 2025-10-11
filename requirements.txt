@@ -2,15 +2,12 @@
 fastapi>=0.115.0
 uvicorn[standard]==0.24.0
 
-# Pydantic AI + Dependencies
-pydantic-ai==0.0.14
-pydantic>=2.10.0
-griffe>=1.4.0
-eval-type-backport>=0.2.0
-logfire-api>=1.2.0
+# Pydantic AI - ESKİ VERSİYON
+pydantic-ai==0.0.10
+pydantic==2.9.2
 
 # Anthropic
-anthropic>=0.40.0
+anthropic==0.34.2
 
 # HTTP Client
 httpx>=0.27.2
@@ -34,4 +31,4 @@ python-dotenv==1.0.0
 python-multipart==0.0.6
 
 # Settings
-pydantic-settings>=2.6.0
+pydantic-settings==2.0.3
