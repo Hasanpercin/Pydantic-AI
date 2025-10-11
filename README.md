@@ -90,7 +90,7 @@ ANTHROPIC_MODEL=claude-sonnet-4-20250514
 
 # Optional
 ENVIRONMENT=production
-PORT=8000
+PORT=8585
 LOG_LEVEL=INFO
 ```
 
@@ -161,14 +161,14 @@ git push origin main
    ANTHROPIC_API_KEY=your-key
    ANTHROPIC_MODEL=claude-sonnet-4-20250514
    ENVIRONMENT=production
-   PORT=8000
+   PORT=8585
    LOG_LEVEL=INFO
    REDIS_URL=redis://:password@astrocalc-redis:6379/0
    ```
 
 5. **Port Mapping:**
-   - Container Port: `8000`
-   - Public Port: `8000` (or auto)
+   - Container Port: `8585`
+   - Public Port: `8585` (or auto)
 
 6. **Domain (Optional):**
    - Custom domain: `agent.yourdomain.com`
@@ -259,7 +259,7 @@ curl -X POST http://localhost:8585/chat \
 **Solution:** Check logs: `docker-compose logs agent-server`
 
 ### Issue: Health check fails
-**Solution:** Verify port 8000 is not in use: `lsof -i :8000`
+**Solution:** Verify port 8585 is not in use: `lsof -i :8585`
 
 ## 📝 Logs
 
