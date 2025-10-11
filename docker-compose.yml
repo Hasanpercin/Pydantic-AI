@@ -4,10 +4,10 @@ services:
   agent-server:
     build: .
     ports:
-      - "8000:8000"
+      - "8585:8585"  # 8000:8000'den değiştir
     environment:
       - ENVIRONMENT=development
-      - PORT=8000
+      - PORT=8585  # 8000'den değiştir
       - REDIS_URL=redis://redis:6379/0
     env_file:
       - .env
