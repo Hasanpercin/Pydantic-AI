@@ -1,8 +1,8 @@
 # FastAPI
-fastapi>=0.115.0
+fastapi==0.104.1
 uvicorn[standard]==0.24.0
 
-# Pydantic AI - ESKİ VERSİYON
+# Pydantic AI - ESKİ STABLE VERSİYON (Griffe problemsiz)
 pydantic-ai==0.0.10
 pydantic==2.9.2
 
