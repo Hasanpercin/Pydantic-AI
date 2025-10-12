@@ -1,13 +1,14 @@
 # FastAPI
-fastapi==0.104.1
+fastapi>=0.115.0
 uvicorn[standard]==0.24.0
 
-# Pydantic AI - ESKİ STABLE VERSİYON (Griffe problemsiz)
-pydantic-ai==0.0.10
-pydantic==2.9.2
+# Pydantic AI + GRIFFE SPECIFIC VERSION
+pydantic==2.10.3
+pydantic-ai==0.0.14
+griffe==1.5.1
 
 # Anthropic
-anthropic==0.34.2
+anthropic>=0.40.0
 
 # HTTP Client
 httpx>=0.27.2
@@ -31,4 +32,4 @@ python-dotenv==1.0.0
 python-multipart==0.0.6
 
 # Settings
-pydantic-settings==2.0.3
+pydantic-settings>=2.6.0
