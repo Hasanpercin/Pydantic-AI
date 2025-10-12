@@ -2,7 +2,7 @@
 fastapi>=0.115.0
 uvicorn[standard]==0.24.0
 
-# Pydantic AI + GRIFFE SPECIFIC VERSION
+# Pydantic AI + Dependencies
 pydantic==2.10.3
 pydantic-ai==0.0.14
 griffe==1.5.1
@@ -22,8 +22,9 @@ zep-cloud==2.0.0
 # Redis
 redis==5.0.1
 
-# Logfire
-logfire==0.20.0
+# Logfire - VERSION PINNED
+logfire==0.70.0
+logfire-api==0.70.0
 
 # Environment
 python-dotenv==1.0.0
