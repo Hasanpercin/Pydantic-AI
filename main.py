@@ -84,13 +84,13 @@ async def health_check():
 async def chat(request: ChatRequest):
     """
     Chat endpoint - Level 0
-    Simple synchronous chat without tools
+    Async chat with Pydantic AI
     """
     try:
         logger.info(f"Received message: {request.message[:50]}...")
         
-        # Run agent (synchronous for Level 0)
-        result = agent.run_sync(request.message)
+        # Run agent (ASYNC!)
+        result = await agent.run(request.message)  # ✅ run_sync yerine run
         
         logger.info(f"Agent response: {result.data[:50]}...")
         
