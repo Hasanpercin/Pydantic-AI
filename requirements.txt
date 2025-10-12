@@ -22,9 +22,8 @@ zep-cloud==2.0.0
 # Redis
 redis==5.0.1
 
-# Logfire - VERSION PINNED
-logfire==0.70.0
-logfire-api==0.70.0
+# Logfire - DOĞRU VERSİYON
+logfire==4.13.0
 
 # Environment
 python-dotenv==1.0.0
