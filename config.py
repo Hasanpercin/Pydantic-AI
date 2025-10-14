@@ -1,79 +1,44 @@
 """
-AstraCalc Agent Server - Configuration
+Configuration settings for AstraCalc Agent Server
 
-Manages environment variables and application settings
+Level 2: Added Calculation Engine and N8N Webhook URLs
 """
 
+import os
 from pydantic_settings import BaseSettings
-from typing import List
 
 
 class Settings(BaseSettings):
-    """Application settings from environment variables"""
+    """Application settings"""
     
-    # Core
-    ENVIRONMENT: str = "production"
-    PORT: int = 8585  
-    LOG_LEVEL: str = "INFO"
+    # Server
+    PORT: int = int(os.getenv("PORT", "8585"))
+    ENVIRONMENT: str = os.getenv("ENVIRONMENT", "production")
     
     # Anthropic
-    ANTHROPIC_API_KEY: str
-    ANTHROPIC_MODEL: str = "claude-sonnet-4-5-20250929"
-    ANTHROPIC_MODEL_FAST: str = "claude-haiku-4"
+    ANTHROPIC_API_KEY: str = os.getenv("ANTHROPIC_API_KEY", "")
+    ANTHROPIC_MODEL: str = os.getenv("ANTHROPIC_MODEL", "claude-sonnet-4-5-20250929")
     
-    # Redis (for future levels)
-    REDIS_URL: str = "redis://redis:6379/0"
+    # Calculation Engine
+    CALCULATION_ENGINE_URL: str = os.getenv(
+        "CALCULATION_ENGINE_URL", 
+        "https://engine.hasanpercin.xyz"
+    )
+    CALCULATION_ENGINE_API_KEY: str = os.getenv("CALCULATION_ENGINE_API_KEY", "")
     
-    # Zep Memory (for future levels)
-    ZEP_API_KEY: str = "placeholder"
-    ZEP_API_URL: str = "https://api.getzep.com"
+    # N8N Webhook for Reports
+    N8N_WEBHOOK_URL: str = os.getenv(
+        "N8N_WEBHOOK_URL",
+        "https://n8n.hasanpercin.xyz/webhook-test/c33b37b1-46ef-4cd2-807c-594a3f329719"
+    )
     
-    # Calculation Engine (for future levels)
-    CALC_ENGINE_URL: str = "https://calc.yourdomain.com"
-    CALC_ENGINE_API_KEY: str = "placeholder"
-    
-    # Monitoring (optional)
-    LOGFIRE_API_KEY: str = "placeholder"
-    
-    # CORS
-    CORS_ORIGINS: List[str] = ["*"]
-    
-    # Security
-    SECRET_KEY: str = "change-this-in-production"
+    # Logging
+    LOG_LEVEL: str = os.getenv("LOG_LEVEL", "INFO")
     
     class Config:
         env_file = ".env"
         case_sensitive = True
 
 
-# Create global settings instance
+# Global settings instance
 settings = Settings()
-
-
-# Validate critical settings
-def validate_settings():
-    """Validates that critical settings are present"""
-    errors = []
-    
-    if not settings.ANTHROPIC_API_KEY or settings.ANTHROPIC_API_KEY == "sk-ant-api03-xxx":
-        errors.append("ANTHROPIC_API_KEY not configured")
-    
-    if settings.SECRET_KEY == "change-this-in-production" and settings.ENVIRONMENT == "production":
-        errors.append("SECRET_KEY must be changed in production")
-    
-    if errors:
-        raise ValueError(f"Configuration errors: {', '.join(errors)}")
-    
-    return True
-
-
-# Run validation
-if __name__ == "__main__":
-    try:
-        validate_settings()
-        print("✅ Configuration valid!")
-        print(f"Environment: {settings.ENVIRONMENT}")
-        print(f"Model: {settings.ANTHROPIC_MODEL}")
-        print(f"Port: {settings.PORT}")
-    except ValueError as e:
-        print(f"❌ Configuration error: {e}")
