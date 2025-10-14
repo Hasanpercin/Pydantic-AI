@@ -1,12 +1,14 @@
 """
 AstraCalc Agent - Pydantic AI Agent Definition
 
-Level 1: Agent with first tool (get_current_date)
+Level 2: Agent with calculation engine and report tools
 """
 
 from pydantic_ai import Agent
 from config import settings
 from tools.basic import get_current_date
+from tools.calculation import get_planet_positions
+from tools.report import generate_chart_report
 import logging
 
 logger = logging.getLogger(__name__)
@@ -33,23 +35,3 @@ TOOL'LARIN:
 
 Kullanıcıya nazik bir şekilde karşılık ver ve astroloji konularında yardımcı ol.
 """
-
-
-def create_agent() -> Agent:
-    """
-    Create and configure the Pydantic AI agent
-    
-    Level 1: Agent with first tool
-    """
-    logger.info("Creating Pydantic AI agent with tools...")
-    
-    agent = Agent(
-        model=settings.ANTHROPIC_MODEL,
-        system_prompt=SYSTEM_PROMPT,
-    )
-    
-    # Register tools
-    agent.tool(get_current_date)
-    
-    logger.info("Agent created successfully with 1 tool")
-    return agent
