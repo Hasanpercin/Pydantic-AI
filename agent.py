@@ -1,11 +1,12 @@
 """
 AstraCalc Agent - Pydantic AI Agent Definition
 
-Level 0: Basic agent without tools
+Level 1: Agent with first tool (get_current_date)
 """
 
 from pydantic_ai import Agent
 from config import settings
+from tools.basic import get_current_date
 import logging
 
 logger = logging.getLogger(__name__)
@@ -16,15 +17,19 @@ SYSTEM_PROMPT = """Sen AstraCalc AI, empatik ve bilgili bir astroloji danışman
 
 ÖZELLİKLERİN:
 - Kullanıcılara astroloji konularında yardımcı olursun
-- Empatik ve destekleyici bir dil kullanırsın
+- Empatik ve destekleyici bir dil kullanırsun
 - Açık ve anlaşılır açıklamalar yaparsın
 - Her seviyeden kullanıcıya uygun iletişim kurarsun
 
+TOOL'LARIN:
+- get_current_date: Bugünün tarihini öğrenmek için kullan
+- Kullanıcı tarih, gün sorduğunda bu tool'u çağır
+
 ŞU AN:
-- Bu Level 0 versiyonudur
-- Henüz tool'lar aktif değil
-- Basit sohbet yapabiliyorsun
-- Yakında çok daha güçlü olacaksın!
+- Bu Level 1 versiyonudur
+- Tool calling aktif!
+- Tarih bilgisine erişebiliyorsun
+- Daha fazla tool yakında gelecek!
 
 Kullanıcıya nazik bir şekilde karşılık ver ve astroloji konularında yardımcı ol.
 """
@@ -32,29 +37,19 @@ Kullanıcıya nazik bir şekilde karşılık ver ve astroloji konularında yard�
 
 def create_agent() -> Agent:
     """
-    Creates and returns a Pydantic AI agent
+    Create and configure the Pydantic AI agent
     
-    Level 0: Basic agent with system prompt only
-    No tools, no dependencies yet
+    Level 1: Agent with first tool
     """
-    logger.info("Creating Pydantic AI agent...")
-    logger.info(f"Model: {settings.ANTHROPIC_MODEL}")
+    logger.info("Creating Pydantic AI agent with tools...")
     
     agent = Agent(
         model=settings.ANTHROPIC_MODEL,
         system_prompt=SYSTEM_PROMPT,
-        retries=2,  # Retry on failure
     )
     
-    logger.info("Agent created successfully!")
-    return agent
-
-
-# For testing
-if __name__ == "__main__":
-    agent = create_agent()
+    # Register tools
+    agent.tool(get_current_date)
     
-    # Test the agent
-    print("\n🧪 Testing agent...")
-    result = agent.run_sync("Merhaba!")
-    print(f"\n✅ Agent response: {result.data}\n")
+    logger.info("Agent created successfully with 1 tool")
+    return agent
