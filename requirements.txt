@@ -33,7 +33,3 @@ python-multipart==0.0.6
 
 # Settings
 pydantic-settings>=2.6.0
-
-# Container'da kontrol et
-docker exec -it ae0571d64447 pip list | grep httpx
-
