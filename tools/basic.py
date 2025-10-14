@@ -11,13 +11,16 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def get_current_date() -> str:
+def get_current_date(ctx) -> str:
     """
     Bugünün tarihini döndürür.
     
     Bu tool mevcut tarihi Türkiye saat diliminde (Europe/Istanbul) verir.
     Kullanıcı "bugün hangi gün", "tarih nedir", "ayın kaçı" gibi 
     sorular sorduğunda bu tool'u kullan.
+    
+    Args:
+        ctx: Pydantic AI RunContext (otomatik geçilir)
     
     Returns:
         str: ISO format tarih (YYYY-MM-DD) ve gün adı
