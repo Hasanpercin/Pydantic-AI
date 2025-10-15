@@ -1,13 +1,12 @@
 """
 AstraCalc Agent - Pydantic AI Agent Definition
-
 Level 2: Agent with calculation engine and report tools
 """
 
-from pydantic_ai import Agent
+from pydantic_ai import Agent, RunContext
 from config import settings
 from tools.basic import get_current_date
-from tools.calculation import get_planet_positions
+from tools.calculation import calculate_sun_sign
 from tools.report import generate_chart_report
 import logging
 
@@ -19,7 +18,7 @@ SYSTEM_PROMPT = """Sen AstraCalc AI, empatik ve bilgili bir astroloji danışman
 
 ÖZELLİKLERİN:
 - Kullanıcılara astroloji konularında yardımcı olursun
-- Empatik ve destekleyici bir dil kullanırsun
+- Empatik ve destekleyici bir dil kullanırsın
 - Açık ve anlaşılır açıklamalar yaparsın
 - Her seviyeden kullanıcıya uygun iletişim kurarsun
 
@@ -29,15 +28,15 @@ TOOL'LARIN VE KULLANIM KURALLARI:
    - Kullanım: Bugünün tarihini öğrenmek için
    - Ne zaman: "bugün hangi gün", "tarih nedir" sorularında
 
-2. get_planet_positions (Engine - HIZLI CEVAPLAR)
-   - Kullanım: Doğum anındaki gezegen pozisyonları
+2. get_sun_sign (HIZLI GÜNEŞ BURCU)
+   - Kullanım: Güneş burcunu hesapla
    - Ne zaman: 
      * "Güneşim hangi burçta?"
-     * "Ayım nerede?"
-     * "Venüsüm hangi burçta?"
-     * Basit, hızlı sorularda
-   - CEVAP STİLİ: Kısa ve öz! MAKSIMUM 4-5 cümle.
-   - Örnek: "Güneşiniz Balık burcunda 25°'de. Bu pozisyon sizi empatik ve hayal gücü yüksek biri yapıyor. Sanat ve manevi konulara ilginiz güçlü."
+     * "Burcum ne?"
+     * "Hangi burçtanım?"
+   - GEREKLİ BİLGİLER: Doğum tarihi (yıl, ay, gün), saati (saat, dakika), UTC offset (İstanbul: 3.0)
+   - CEVAP STİLİ: Kısa ve öz! 2-3 cümle
+   - Örnek: "Güneşiniz Balık burcunda 354°'de. Bu sizi empatik ve hayal gücü güçlü biri yapıyor."
 
 3. generate_chart_report (N8N - DETAYLI RAPOR)
    - Kullanım: Tam doğum haritası raporu
@@ -45,24 +44,60 @@ TOOL'LARIN VE KULLANIM KURALLARI:
      * "Doğum haritamı çıkar"
      * "Tam rapor istiyorum"
      * "Detaylı analiz yap"
-     * "Beni tanımla"
-     * Kapsamlı yorumlar gerektiğinde
-   - CEVAP STİLİ: Rapor linkini/özetini paylaş
 
 ÖNEMLİ KURALLAR:
-- Doğum bilgisi sorularında MUTLAKA: tarih, saat, yer bilgisi iste
+- Doğum bilgisi sorularında MUTLAKA: yıl, ay, gün, saat, dakika bilgisi iste
 - Eksik bilgi varsa kibarca sor, ASLA tahmin etme
-- Basit sorular = get_planet_positions (hızlı, kısa)
+- UTC offset için İstanbul kullanıcıları için 3.0 kullan (varsayılan)
+- Basit sorular = get_sun_sign (hızlı)
 - Detaylı analiz = generate_chart_report (tam rapor)
-
-ŞU AN:
-- Level 2 versiyonu
-- 3 tool aktif
-- Gerçek astroloji hesaplamaları yapabiliyorsun
-- Hem hızlı hem detaylı cevap verebiliyorsun
 
 Kullanıcıya nazik bir şekilde karşılık ver ve astroloji konularında yardımcı ol.
 """
+
+
+async def get_sun_sign_tool(
+    ctx: RunContext[None],
+    year: int,
+    month: int,
+    day: int,
+    hour: int,
+    minute: int,
+    tz_offset: float = 3.0
+) -> str:
+    """
+    Kullanıcının güneş burcunu hesapla.
+    
+    Args:
+        ctx: Pydantic AI RunContext (otomatik geçilir)
+        year: Doğum yılı (örn: 1990)
+        month: Doğum ayı (1-12)
+        day: Doğum günü (1-31)
+        hour: Doğum saati (0-23)
+        minute: Doğum dakikası (0-59)
+        tz_offset: UTC offset (İstanbul için 3.0, varsayılan)
+    
+    Returns:
+        str: Güneş burcu ve derece bilgisi
+    """
+    try:
+        logger.info(f"🌞 Güneş burcu hesaplanıyor: {year}-{month:02d}-{day:02d} {hour:02d}:{minute:02d}")
+        
+        result = await calculate_sun_sign(year, month, day, hour, minute, tz_offset)
+        
+        response = f"""🌞 Güneş Burcunuz: {result['sun_sign']}
+
+📊 Detaylar:
+- Derece: {result['sun_degree']}°
+- UTC Zaman: {result['ts_utc']}
+
+{result['sun_sign']} burcu, sizin temel karakterinizi ve ego yapınızı temsil eder."""
+        
+        return response
+        
+    except Exception as e:
+        logger.error(f"❌ Güneş burcu hesaplamasında hata: {str(e)}")
+        return f"❌ Güneş burcunu hesaplarken bir hata oluştu. Lütfen doğum bilgilerinizi kontrol edin ve tekrar deneyin."
 
 
 def create_agent() -> Agent:
@@ -80,7 +115,7 @@ def create_agent() -> Agent:
     
     # Register tools
     agent.tool(get_current_date)
-    agent.tool(get_planet_positions)
+    agent.tool(get_sun_sign_tool)
     agent.tool(generate_chart_report)
     
     logger.info("Agent created successfully with 3 tools")
