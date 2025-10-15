@@ -37,7 +37,7 @@ class Settings(BaseSettings):
     # N8N Webhook for Reports
     N8N_WEBHOOK_URL: str = os.getenv(
         "N8N_WEBHOOK_URL",
-        "https://n8n.hasanpercin.xyz/webhook-test/c33b37b1-46ef-4cd2-807c-594a3f329719"
+        "https://n8n.hasanpercin.xyz/webhook/c33b37b1-46ef-4cd2-807c-594a3f329719"
     )
     
     # Zep Memory
