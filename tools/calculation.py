@@ -1,3 +1,8 @@
+# Yedek al
+cp tools/calculation.py tools/calculation.py.backup
+
+# Yeni içeriği yaz
+cat > tools/calculation.py << 'EOF'
 # backend/tools/calculation.py
 """
 Calculation Engine Integration
@@ -54,13 +59,8 @@ async def calculate_sun_sign(
             "sun_degree": 354.6,
             "ts_utc": "1990-03-15T11:30:00+00:00"
         }
-    
-    Raises:
-        httpx.HTTPError: API bağlantı hatası
-        ValueError: Geçersiz yanıt
     """
     try:
-        # 1️⃣ Request hazırla
         request_data = {
             "year": year,
             "month": month,
@@ -72,14 +72,12 @@ async def calculate_sun_sign(
         
         logger.info(f"📡 Calculation Engine'e istek: {request_data}")
         
-        # 2️⃣ API'ye istek gönder
         async with httpx.AsyncClient(timeout=10.0) as client:
             response = await client.post(
                 f"{settings.CALCULATION_ENGINE_URL}/natal/basic",
                 json=request_data,
                 headers={
                     "Content-Type": "application/json",
-                    # API key varsa ekle
                     **({"X-API-Key": settings.CALCULATION_ENGINE_API_KEY} 
                        if settings.CALCULATION_ENGINE_API_KEY else {})
                 }
@@ -89,17 +87,16 @@ async def calculate_sun_sign(
         
         logger.info(f"✅ Calculation Engine yanıtı alındı")
         
-        # 3️⃣ Güneş'i bul (lowercase "sun")
+        # Güneş'i bul (lowercase "sun")
         sun_data = next(
             (body for body in data["bodies"] if body["name"].lower() == "sun"),
             None
         )
         
         if not sun_data:
-            logger.error(f"❌ Güneş verisi bulunamadı. Bodies: {data.get('bodies', [])}")
+            logger.error(f"❌ Güneş verisi bulunamadı")
             raise ValueError("Güneş verisi bulunamadı")
         
-        # 4️⃣ Burç ismini çevir
         sign_index = sun_data["sign_index"]
         sun_sign = ZODIAC_SIGNS[sign_index]
         
@@ -112,32 +109,14 @@ async def calculate_sun_sign(
         logger.info(f"🌞 Sonuç: {result}")
         return result
         
-    except httpx.HTTPStatusError as e:
-        logger.error(f"❌ HTTP Hata {e.response.status_code}: {e.response.text}")
-        raise
-    except httpx.RequestError as e:
-        logger.error(f"❌ Bağlantı hatası: {str(e)}")
-        raise
-    except KeyError as e:
-        logger.error(f"❌ Yanıt formatı hatalı: {str(e)}")
-        raise ValueError(f"API yanıtı eksik: {str(e)}")
     except Exception as e:
-        logger.error(f"❌ Beklenmeyen hata: {str(e)}")
+        logger.error(f"❌ Hata: {str(e)}")
         raise
 
 
 async def test_calculation_engine() -> bool:
-    """
-    Calculation Engine bağlantısını test et
-    
-    Returns:
-        True: Bağlantı başarılı
-        False: Bağlantı başarısız
-    """
+    """Calculation Engine bağlantısını test et"""
     try:
-        logger.info(f"🔍 Calculation Engine testi başlatılıyor: {settings.CALCULATION_ENGINE_URL}")
-        
-        # Test verisi
         test_data = {
             "year": 2000,
             "month": 1,
@@ -150,66 +129,12 @@ async def test_calculation_engine() -> bool:
         async with httpx.AsyncClient(timeout=5.0) as client:
             response = await client.post(
                 f"{settings.CALCULATION_ENGINE_URL}/natal/basic",
-                json=test_data,
-                headers={
-                    "Content-Type": "application/json",
-                    **({"X-API-Key": settings.CALCULATION_ENGINE_API_KEY} 
-                       if settings.CALCULATION_ENGINE_API_KEY else {})
-                }
+                json=test_data
             )
-            
-            if response.status_code == 200:
-                logger.info(f"✅ Calculation Engine çalışıyor!")
-                return True
-            else:
-                logger.warning(f"⚠️ Calculation Engine yanıt kodu: {response.status_code}")
-                return False
-                
-    except Exception as e:
-        logger.error(f"❌ Calculation Engine bağlantı testi başarısız: {str(e)}")
+            return response.status_code == 200
+    except:
         return False
+EOF
 
-
-# Test için main block
-if __name__ == "__main__":
-    import asyncio
-    
-    async def main():
-        # Test 1: Bağlantı testi
-        print("=" * 50)
-        print("Test 1: Bağlantı Testi")
-        print("=" * 50)
-        is_connected = await test_calculation_engine()
-        print(f"Sonuç: {'✅ Başarılı' if is_connected else '❌ Başarısız'}\n")
-        
-        if not is_connected:
-            return
-        
-        # Test 2: Güneş burcu hesaplama
-        print("=" * 50)
-        print("Test 2: Güneş Burcu Hesaplama")
-        print("=" * 50)
-        try:
-            result = await calculate_sun_sign(
-                year=1990,
-                month=3,
-                day=15,
-                hour=14,
-                minute=30,
-                tz_offset=3.0
-            )
-            print(f"✅ Sonuç:")
-            print(f"   Güneş Burcu: {result['sun_sign']}")
-            print(f"   Güneş Derecesi: {result['sun_degree']}°")
-            print(f"   UTC Zaman: {result['ts_utc']}")
-        except Exception as e:
-            print(f"❌ Hata: {str(e)}")
-    
-    # Logging ayarla
-    logging.basicConfig(
-        level=logging.INFO,
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-    )
-    
-    # Test'i çalıştır
-    asyncio.run(main())
+# Dosyayı kontrol et
+head -30 tools/calculation.py
