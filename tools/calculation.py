@@ -45,15 +45,14 @@ async def get_planet_positions(
         logger.info(f"Calculating planets for {datetime_str} at {city} ({latitude}, {longitude})")
         
         # Calculation Engine API çağrısı
-        # Not: Gerçek endpoint'i Engine reposundan kontrol edeceğiz
+        # Engine reposunda endpoint kontrol edilmeli
         async with httpx.AsyncClient(timeout=30.0) as client:
             response = await client.post(
-                f"{settings.CALCULATION_ENGINE_URL}/api/chart/calculate",
+                f"{settings.CALCULATION_ENGINE_URL}/natal",
                 json={
                     "datetime": datetime_str,
                     "latitude": latitude,
-                    "longitude": longitude,
-                    "timezone": "auto"  # veya kullanıcıdan al
+                    "longitude": longitude
                 },
                 headers={
                     "Authorization": f"Bearer {settings.CALCULATION_ENGINE_API_KEY}"
