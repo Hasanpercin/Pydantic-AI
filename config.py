@@ -1,9 +1,7 @@
 """
 Configuration settings for AstraCalc Agent Server
-
 Level 2: Added Calculation Engine and N8N Webhook URLs
 """
-
 import os
 from pydantic_settings import BaseSettings
 
@@ -31,7 +29,7 @@ class Settings(BaseSettings):
     )
     CALCULATION_ENGINE_API_KEY: str = os.getenv(
         "CALCULATION_ENGINE_API_KEY",
-        os.getenv("CALC_ENGINE_API_KEY", "")
+        os.getenv("CALC_ENGINE_API_KEY", "testkey")  # FREE tier API key
     )
     
     # N8N Webhook for Reports
