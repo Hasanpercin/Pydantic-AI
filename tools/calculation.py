@@ -1,88 +1,123 @@
-"""
-AstraCalc Agent - Calculation Engine Tools
-
-Level 2: Direct calculation engine calls for quick astrology data
-"""
+# backend/tools/calculation.py
 
 import httpx
 from datetime import datetime
-from typing import Dict, Any
+from typing import Optional
 import logging
-from config import settings
 
 logger = logging.getLogger(__name__)
 
+CALCULATION_ENGINE_URL = "http://calculation-engine:8001"
 
-async def get_planet_positions(
-    ctx,
-    birth_date: str,
-    birth_time: str,
-    latitude: float,
-    longitude: float,
-    city: str = "Unknown"
-) -> str:
+# Burç isimleri (sign_index -> isim)
+ZODIAC_SIGNS = [
+    "Koç",      # 0
+    "Boğa",     # 1
+    "İkizler",  # 2
+    "Yengeç",   # 3
+    "Aslan",    # 4
+    "Başak",    # 5
+    "Terazi",   # 6
+    "Akrep",    # 7
+    "Yay",      # 8
+    "Oğlak",    # 9
+    "Kova",     # 10
+    "Balık"     # 11
+]
+
+
+async def calculate_sun_sign(
+    year: int,
+    month: int,
+    day: int,
+    hour: int,
+    minute: int,
+    tz_offset: float = 3.0  # İstanbul için varsayılan
+) -> dict:
     """
-    Doğum anındaki gezegen pozisyonlarını hesaplar.
-    
-    Kullanıcı doğum bilgilerini verdiğinde (tarih, saat, yer) bu tool ile
-    hızlıca gezegen pozisyonlarını öğrenebilirsin.
+    Güneş burcunu hesapla
     
     Args:
-        ctx: Pydantic AI RunContext (otomatik geçilir)
-        birth_date: Doğum tarihi (YYYY-MM-DD formatında, örn: "1990-03-15")
-        birth_time: Doğum saati (HH:MM formatında, örn: "14:30")
-        latitude: Enlem (örn: 41.0082 İstanbul için)
-        longitude: Boylam (örn: 28.9784 İstanbul için)
-        city: Şehir adı (opsiyonel, bilgi amaçlı)
+        year: Doğum yılı
+        month: Doğum ayı (1-12)
+        day: Doğum günü (1-31)
+        hour: Doğum saati (0-23)
+        minute: Doğum dakikası (0-59)
+        tz_offset: UTC offset (İstanbul için 3.0)
     
     Returns:
-        str: Gezegen pozisyonları ve burç bilgileri
+        {
+            "sun_sign": "Balık",
+            "sun_degree": 354.5,
+            "ts_utc": "1990-03-15T11:30:00Z"
+        }
     """
     try:
-        # Tarih ve saati birleştir
-        datetime_str = f"{birth_date}T{birth_time}:00"
+        # 1️⃣ Request hazırla
+        request_data = {
+            "year": year,
+            "month": month,
+            "day": day,
+            "hour": hour,
+            "minute": minute,
+            "tz_offset": tz_offset
+        }
         
-        logger.info(f"Calculating planets for {datetime_str} at {city} ({latitude}, {longitude})")
+        logger.info(f"📡 Calculation Engine'e istek gönderiliyor: {request_data}")
         
-        # Calculation Engine API çağrısı
-        # Engine reposunda endpoint kontrol edilmeli
-        async with httpx.AsyncClient(timeout=30.0) as client:
+        # 2️⃣ API'ye istek gönder
+        async with httpx.AsyncClient() as client:
             response = await client.post(
-                f"{settings.CALCULATION_ENGINE_URL}/natal",
-                json={
-                    "datetime": datetime_str,
-                    "latitude": latitude,
-                    "longitude": longitude
-                },
-                headers={
-                    "Authorization": f"Bearer {settings.CALCULATION_ENGINE_API_KEY}"
-                } if settings.CALCULATION_ENGINE_API_KEY else {}
+                f"{CALCULATION_ENGINE_URL}/natal/basic",
+                json=request_data,
+                timeout=10.0
             )
-            
-            if response.status_code == 200:
-                data = response.json()
-                
-                # Response'u formatla
-                result = f"🌟 Doğum Bilgileri: {city}\n"
-                result += f"📅 Tarih: {birth_date} {birth_time}\n"
-                result += f"📍 Konum: {latitude}, {longitude}\n\n"
-                
-                # Gezegenleri formatla (API response yapısına göre düzenlenecek)
-                if "planets" in data:
-                    result += "Gezegenler:\n"
-                    for planet, info in data["planets"].items():
-                        result += f"  {planet}: {info.get('sign', '?')} {info.get('degree', '?')}°\n"
-                
-                logger.info(f"Successfully calculated planets for {city}")
-                return result
-            else:
-                error_msg = f"Calculation Engine error: {response.status_code}"
-                logger.error(error_msg)
-                return f"❌ Hesaplama hatası: {error_msg}"
-                
-    except httpx.TimeoutException:
-        logger.error("Calculation Engine timeout")
-        return "❌ Calculation Engine'e bağlanırken zaman aşımı oluştu."
+            response.raise_for_status()
+            data = response.json()
+        
+        logger.info(f"✅ Calculation Engine yanıtı alındı")
+        
+        # 3️⃣ Güneş'i bul
+        sun_data = next(
+            (body for body in data["bodies"] if body["name"] == "Sun"),
+            None
+        )
+        
+        if not sun_data:
+            raise ValueError("Güneş verisi bulunamadı")
+        
+        # 4️⃣ Burç ismini çevir
+        sign_index = sun_data["sign_index"]
+        sun_sign = ZODIAC_SIGNS[sign_index]
+        
+        result = {
+            "sun_sign": sun_sign,
+            "sun_degree": sun_data["lon"],
+            "ts_utc": data["ts_utc"]
+        }
+        
+        logger.info(f"🌞 Sonuç: {result}")
+        return result
+        
+    except httpx.HTTPError as e:
+        logger.error(f"❌ HTTP hatası: {str(e)}")
+        raise
     except Exception as e:
-        logger.error(f"Error in get_planet_positions: {str(e)}")
-        return f"❌ Hesaplama hatası: {str(e)}"
+        logger.error(f"❌ Genel hata: {str(e)}")
+        raise
+
+
+async def test_connection() -> bool:
+    """
+    Calculation Engine bağlantısını test et
+    """
+    try:
+        async with httpx.AsyncClient() as client:
+            response = await client.get(
+                f"{CALCULATION_ENGINE_URL}/health",
+                timeout=5.0
+            )
+            return response.status_code == 200
+    except Exception as e:
+        logger.error(f"❌ Bağlantı testi başarısız: {str(e)}")
+        return False
