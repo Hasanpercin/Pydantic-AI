@@ -7,7 +7,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-CALCULATION_ENGINE_URL = "http://calculation-engine:8001"
+CALCULATION_ENGINE_URL = "https://engine.hasanpercin.xyz"
 
 # Burç isimleri (sign_index -> isim)
 ZODIAC_SIGNS = [
