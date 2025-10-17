@@ -1,23 +1,23 @@
-# Pydantic-AI
+## Level 2 Documentation
 
-## Level 2 Updates
+### Calculation Engine Integration
+The Calculation Engine allows for efficient processing of data and performing complex calculations. It integrates seamlessly with the Pydantic AI framework and can be utilized by configuring the engine parameters in the settings.
 
-### New Features
-- **Calculation Engine Integration**: Integrated a new calculation engine to enhance data processing capabilities.
-- **N8N Webhook for Reports**: Added a webhook integration with N8N to automate report generation.
+### N8N Webhook
+Pydantic AI supports N8N webhooks for automating workflows. Users can set up triggers and actions within their N8N environment to interact with the Pydantic AI application.
 
-### Improved Tools
-- **get_current_date**: Enhanced to return the current date in various formats.
-- **calculate_sun_sign**: Improved logic for accurate sun sign calculation based on birthdate.
-- **generate_chart_report**: Updated to provide more detailed chart reports.
+### Async Agent
+The async agent enables asynchronous processing, allowing for non-blocking operations. This is particularly useful for handling multiple requests simultaneously without degrading performance.
 
-### Enhanced Configuration
-- **API Endpoints**: Added new API endpoints for better interaction and data retrieval.
-- **Async Agent Implementation**: Implemented asynchronous processing for better performance.
+### Tools
+Pydantic AI comes with a set of tools designed to enhance functionality:
+- **Data Validation:** Ensures that the input data adheres to the defined schema.
+- **Data Transformation:** Allows for modifying data structures to meet specific requirements.
 
-### Updated Claude Models
-- **Sonnet 4.5**: Updated the model for improved responses.
-- **Haiku 4**: Enhanced the model for more accurate outputs.
+### Models
+Models in Pydantic AI are defined using Python classes. Each model corresponds to a specific data structure and includes validation rules to ensure data integrity.
 
-### Documentation
-- **Comprehensive Turkish System Prompt Documentation**: Provided thorough documentation in Turkish for system prompts.
+### Configuration Details
+Configuration settings can be managed through a configuration file where users can specify parameters related to the Calculation Engine, N8N integrations, and other important settings. Make sure to review the configuration options thoroughly to take full advantage of the features available.
+
+For more detailed information regarding each section, refer to the respective documentation pages.
